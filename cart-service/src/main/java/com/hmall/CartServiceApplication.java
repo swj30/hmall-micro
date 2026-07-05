@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @EnableFeignClients注解的作用寻找使用 @FeignClient 注解的接口生成Feign客户端(代理对象)，
  * 自动配置 Feign 客户端与 Spring Cloud LoadBalancer 的集成。
  */
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.hmall.api")
 @MapperScan("com.hmall.cart.mapper")
 @SpringBootApplication
 public class CartServiceApplication {
