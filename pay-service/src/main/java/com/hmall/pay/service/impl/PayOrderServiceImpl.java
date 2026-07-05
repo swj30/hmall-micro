@@ -1,19 +1,18 @@
-package com.hmall.trade.service.impl;
+package com.hmall.pay.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmall.api.trade.TradeClient;
 import com.hmall.api.user.UserClient;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
-import com.hmall.trade.domain.dto.PayApplyDTO;
-import com.hmall.trade.domain.dto.PayOrderFormDTO;
-import com.hmall.trade.domain.po.Order;
-import com.hmall.trade.domain.po.PayOrder;
-import com.hmall.trade.enums.PayStatus;
-import com.hmall.trade.mapper.PayOrderMapper;
-import com.hmall.trade.service.IOrderService;
-import com.hmall.trade.service.IPayOrderService;
+import com.hmall.pay.domain.dto.PayApplyDTO;
+import com.hmall.pay.domain.dto.PayOrderFormDTO;
+import com.hmall.pay.domain.po.PayOrder;
+import com.hmall.pay.enums.PayStatus;
+import com.hmall.pay.mapper.PayOrderMapper;
+import com.hmall.pay.service.IPayOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,7 @@ import java.time.LocalDateTime;
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
 
     private final UserClient userClient;
-    private final IOrderService orderService;
+    private final TradeClient tradeClient;
 
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
@@ -45,11 +44,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         if (!success) {
             throw new BizIllegalException("交易已支付或关闭！");
         }
-        var order = new Order();
-        order.setId(po.getBizOrderNo());
-        order.setStatus(2);
-        order.setPayTime(LocalDateTime.now());
-        orderService.updateById(order);
+        tradeClient.markOrderPaySuccess(po.getBizOrderNo());
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {

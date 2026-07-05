@@ -1,4 +1,4 @@
-package com.hmall.trade.domain.vo;
+package com.hmall.pay.domain.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -1,9 +1,9 @@
-package com.hmall.trade.service;
+package com.hmall.pay.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.hmall.trade.domain.dto.PayApplyDTO;
-import com.hmall.trade.domain.dto.PayOrderFormDTO;
-import com.hmall.trade.domain.po.PayOrder;
+import com.hmall.pay.domain.dto.PayApplyDTO;
+import com.hmall.pay.domain.dto.PayOrderFormDTO;
+import com.hmall.pay.domain.po.PayOrder;
 
 public interface IPayOrderService extends IService<PayOrder> {
 

@@ -1,4 +1,4 @@
-package com.hmall.trade.enums;
+package com.hmall.pay.enums;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
