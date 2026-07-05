@@ -3,6 +3,8 @@ package com.hmall.cart.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmall.cart.client.ItemClient;
+import com.hmall.cart.domain.dto.ItemDTO;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.CollUtils;
@@ -11,13 +13,19 @@ import com.hmall.cart.domain.po.Cart;
 import com.hmall.cart.domain.vo.CartVO;
 import com.hmall.cart.mapper.CartMapper;
 import com.hmall.cart.service.ICartService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor    // 配合 final/@NonNull 字段实现构造器注入
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
+
+    private final ItemClient itemClient;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -44,22 +52,22 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     }
 
     private void handleCartItems(List<CartVO> vos) {
-        // TODO: item-service 拆分后，通过 Feign 远程调用获取商品信息
-        // var itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
-        // var items = itemService.queryItemByIds(itemIds);
-        // if (CollUtils.isEmpty(items)) {
-        //     return;
-        // }
-        // var itemMap = items.stream().collect(Collectors.toMap(ItemDTO::getId, Function.identity()));
-        // for (CartVO v : vos) {
-        //     var item = itemMap.get(v.getItemId());
-        //     if (item == null) {
-        //         continue;
-        //     }
-        //     v.setNewPrice(item.getPrice());
-        //     v.setStatus(item.getStatus());
-        //     v.setStock(item.getStock());
-        // }
+        // 通过 Feign 远程调用获取商品信息
+         var itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
+         var items = itemClient.queryItemByIds(itemIds);
+         if (CollUtils.isEmpty(items)) {
+             return;
+         }
+         var itemMap = items.stream().collect(Collectors.toMap(ItemDTO::getId, Function.identity()));
+         for (CartVO v : vos) {
+             var item = itemMap.get(v.getItemId());
+             if (item == null) {
+                 continue;
+             }
+             v.setNewPrice(item.getPrice());
+             v.setStatus(item.getStatus());
+             v.setStock(item.getStock());
+         }
     }
 
     @Override
