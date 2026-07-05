@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collection;
 
-@FeignClient(name = "cart-service", path = "carts")
+@FeignClient(name = "cart-service", path = "/carts")
 public interface CartClient {
 
     @DeleteMapping

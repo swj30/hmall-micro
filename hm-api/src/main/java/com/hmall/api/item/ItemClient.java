@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Collection;
 import java.util.List;
 
-@FeignClient(name = "item-service", path = "items")
+@FeignClient(name = "item-service", path = "/items")
 public interface ItemClient {
 
     @GetMapping
