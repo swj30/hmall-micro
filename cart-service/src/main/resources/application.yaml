@@ -17,9 +17,11 @@ spring:
       password: nacos # 密码
       discovery:
         ip: 192.168.150.1 # 本服务所在机器的ip地址
-    feign:
-      okhttp:
-        enabled: true
+    sentinel:
+      transport:
+        dashboard: 192.168.150.88:8858
+        client-ip: 192.168.150.1
+      http-method-specify: true # 开启请求方式前缀可根据http请求方法区分簇点链路
 mybatis-plus:
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
@@ -49,3 +51,9 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.hmall.cart.controller
+
+feign:
+  okhttp:
+    enabled: true
+  sentinel:
+    enabled: true # 开启feign对sentinel的支持
