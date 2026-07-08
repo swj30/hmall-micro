@@ -6,6 +6,7 @@ import com.hmall.api.item.ItemClient;
 import com.hmall.api.item.dto.ItemDTO;
 import com.hmall.api.item.dto.OrderDetailDTO;
 import com.hmall.common.exception.BadRequestException;
+import com.hmall.common.utils.UserContext;
 import com.hmall.trade.domain.dto.OrderFormDTO;
 import com.hmall.trade.domain.po.Order;
 import com.hmall.trade.domain.po.OrderDetail;
@@ -50,7 +51,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         order.setTotalFee(total);
         order.setPaymentType(orderFormDTO.getPaymentType());
-        order.setUserId(1L);
+        order.setUserId(UserContext.getUser());
         order.setStatus(1);
         save(order);
 

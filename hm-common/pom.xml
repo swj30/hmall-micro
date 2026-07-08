@@ -32,6 +32,12 @@
             <artifactId>spring-webmvc</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!--完成Feign自动装配-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <!--日志-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

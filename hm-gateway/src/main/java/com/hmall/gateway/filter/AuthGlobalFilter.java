@@ -48,9 +48,12 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange, e.getMessage());
         }
 
-        // TODO 将userId向下游微服务传递
+        // 向下游服务传递用户信息
+        ServerWebExchange newExchange = exchange.mutate()
+                .request(builder -> builder.header("user-info", userId.toString()))
+                .build();
         log.debug("用户 {} 请求 {}", userId, path);
-        return chain.filter(exchange);
+        return chain.filter(newExchange);
     }
 
     private boolean isExcluded(String path) {

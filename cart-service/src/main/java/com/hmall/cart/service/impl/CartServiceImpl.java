@@ -8,6 +8,7 @@ import com.hmall.api.item.dto.ItemDTO;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.CollUtils;
+import com.hmall.common.utils.UserContext;
 import com.hmall.cart.domain.dto.CartFormDTO;
 import com.hmall.cart.domain.po.Cart;
 import com.hmall.cart.domain.vo.CartVO;
@@ -29,7 +30,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
-        var userId = 1L;
+        var userId = UserContext.getUser();
         if (checkItemExists(cartFormDTO.getItemId(), userId)) {
             baseMapper.updateNum(cartFormDTO.getItemId(), userId);
             return;
@@ -42,7 +43,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 
     @Override
     public List<CartVO> queryMyCarts() {
-        var carts = lambdaQuery().eq(Cart::getUserId, 1L).list();
+        var carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUser()).list();
         if (CollUtils.isEmpty(carts)) {
             return CollUtils.emptyList();
         }
@@ -74,7 +75,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     public void removeByItemIds(Collection<Long> itemIds) {
         var queryWrapper = new QueryWrapper<Cart>();
         queryWrapper.lambda()
-                .eq(Cart::getUserId, 1L)
+                .eq(Cart::getUserId, UserContext.getUser())
                 .in(Cart::getItemId, itemIds);
         remove(queryWrapper);
     }
