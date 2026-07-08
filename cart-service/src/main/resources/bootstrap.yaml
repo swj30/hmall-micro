@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: cart-service # 服务名称
+  profiles:
+    active: dev

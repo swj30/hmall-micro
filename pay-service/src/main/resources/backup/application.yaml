@@ -1,12 +1,12 @@
 server:
-  port: 8085
+  port: 8086
 spring:
   application:
-    name: trade-service
+    name: pay-service
   profiles:
     active: dev
   datasource:
-    url: jdbc:mysql://${hm.db.host}:3306/hm-trade?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${hm.db.host}:3306/hm-pay?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${hm.db.pw}
@@ -17,6 +17,7 @@ spring:
       password: nacos
       discovery:
         ip: 192.168.150.1
+        namespace: ${NACOS_NAMESPACE:28dfebff-7ab9-4c2b-9b42-07731076135e}  #命名空间
     feign:
       okhttp:
         enabled: true
@@ -37,8 +38,8 @@ logging:
 knife4j:
   enable: true
   openapi:
-    title: 交易服务接口文档
-    description: "交易服务接口文档"
+    title: 支付服务接口文档
+    description: "支付服务接口文档"
     email: yjy@itcast.cn
     concat: 黑马程序员
     url: https://www.itheima.com/
@@ -48,10 +49,9 @@ knife4j:
         group-name: default
         api-rule: package
         api-rule-resources:
-          - com.hmall.trade.controller
+          - com.hmall.pay.controller
 
-
-#分布式事务
+#分布式事务相关配置
 seata:
   registry: # TC服务注册中心的配置，微服务根据这些信息去注册中心获取tc服务地址
     type: nacos # 注册中心类型 nacos

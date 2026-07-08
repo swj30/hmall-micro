@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: hm-gateway
+  profiles:
+    active: dev
