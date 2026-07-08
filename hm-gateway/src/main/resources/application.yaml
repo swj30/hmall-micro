@@ -23,7 +23,10 @@ spring:
         - id: cart-service
           uri: lb://cart-service
           predicates:
-            - Path=/carts/**
+            - Path=/api/carts/**
+          filters:
+            - StripPrefix=1
+            - FirstFilter
         - id: user-service
           uri: lb://user-service
           predicates:
@@ -36,6 +39,8 @@ spring:
           uri: lb://pay-service
           predicates:
             - Path=/pay-orders/**
+      default-filters:
+        - FirstFilter
 logging:
   level:
     com.hmall: debug
