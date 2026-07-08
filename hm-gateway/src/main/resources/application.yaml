@@ -16,6 +16,7 @@ spring:
           enabled: false
       routes:
         - id: item-service
+          # lb 负载均衡
           uri: lb://item-service
           predicates:
             - Path=/items/**,/search/**
