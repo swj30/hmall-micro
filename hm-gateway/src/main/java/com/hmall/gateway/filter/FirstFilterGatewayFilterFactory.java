@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  *         - FirstFilter # 此处直接以自定义的GatewayFilterFactory类名称前缀来声明过滤器 全局配置
  */
 @Slf4j
-@Component
+//@Component
 public class FirstFilterGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
     @Override
     public GatewayFilter apply(Object config) {

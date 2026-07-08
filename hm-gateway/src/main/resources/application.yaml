@@ -23,10 +23,7 @@ spring:
         - id: cart-service
           uri: lb://cart-service
           predicates:
-            - Path=/api/carts/**
-          filters:
-            - StripPrefix=1
-            - FirstFilter
+            - Path=/carts/**
         - id: user-service
           uri: lb://user-service
           predicates:
@@ -39,8 +36,25 @@ spring:
           uri: lb://pay-service
           predicates:
             - Path=/pay-orders/**
-      default-filters:
-        - FirstFilter
+hm:
+  jwt:
+    location: classpath:hmall.jks
+    alias: hmall
+    password: hmall123
+    tokenTTL: 30m
+  auth:
+    excludePaths:
+      - /search/**
+      - /users/login
+      - /items/**
+      - /hi
+      - /error
+      - /favicon.ico
+      - /v2/**
+      - /v3/**
+      - /swagger-resources/**
+      - /webjars/**
+      - /doc.html
 logging:
   level:
     com.hmall: debug

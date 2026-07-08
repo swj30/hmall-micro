@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
  * 全局过滤器，不需要在路由中配置即可生效
  */
 @Slf4j
-@Component
+//@Component
 public class PrintAnyGlobalFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
