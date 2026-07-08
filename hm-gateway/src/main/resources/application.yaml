@@ -1,0 +1,44 @@
+server:
+  port: 18088
+spring:
+  application:
+    name: hm-gateway
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 192.168.150.88:8848
+      username: nacos
+      password: nacos
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: item-service
+          uri: lb://item-service
+          predicates:
+            - Path=/items/**,/search/**
+        - id: cart-service
+          uri: lb://cart-service
+          predicates:
+            - Path=/carts/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**,/addresses/**
+        - id: trade-service
+          uri: lb://trade-service
+          predicates:
+            - Path=/orders/**
+        - id: pay-service
+          uri: lb://pay-service
+          predicates:
+            - Path=/pay-orders/**
+logging:
+  level:
+    com.hmall: debug
+  pattern:
+    dateformat: HH:mm:ss:SSS
+  file:
+    path: "logs/${spring.application.name}"
