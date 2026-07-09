@@ -14,7 +14,7 @@ public class JwtTool {
     private final JWTSigner jwtSigner;
 
     public JwtTool(KeyPair keyPair) {
-        this.jwtSigner = JWTSignerUtil.createSigner("rs256", keyPair);
+        this.jwtSigner = JWTSignerUtil.createSigner("RS256", keyPair);
     }
 
     public Long parseToken(String token) {

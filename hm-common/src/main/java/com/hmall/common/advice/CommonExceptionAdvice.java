@@ -7,13 +7,13 @@ import com.hmall.common.exception.DbException;
 import com.hmall.common.utils.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.NestedServletException;
 
-import java.net.BindException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
