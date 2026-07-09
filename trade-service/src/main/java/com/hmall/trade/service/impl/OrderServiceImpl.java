@@ -5,6 +5,7 @@ import com.hmall.api.cart.CartClient;
 import com.hmall.api.item.ItemClient;
 import com.hmall.api.item.dto.ItemDTO;
 import com.hmall.api.item.dto.OrderDetailDTO;
+import com.hmall.common.constant.RabbitMQConstant;
 import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.utils.UserContext;
 import com.hmall.trade.domain.dto.OrderFormDTO;
@@ -15,6 +16,7 @@ import com.hmall.trade.service.IOrderDetailService;
 import com.hmall.trade.service.IOrderService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final ItemClient itemClient;
     private final IOrderDetailService detailService;
     private final CartClient cartClient;
+    private final RabbitTemplate rabbitTemplate;
 
 
     @Override
@@ -58,7 +61,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
         detailService.saveBatch(details);
 
-        cartClient.deleteCartItemByIds(itemIds);
+        // 改为异步调用   ->  根据商品ids清空购物车内的商品
+        // cartClient.deleteCartItemByIds(itemIds);
+        rabbitTemplate.convertAndSend(RabbitMQConstant.TRADE_EXCHANGE_NAME, RabbitMQConstant.TRADE_SUCCESS_ROUTING_KEY, itemIds);
+
+        // 发送消息给RabbitMQ, 商品ids
 
         try {
             itemClient.deductStock(detailDTOS);

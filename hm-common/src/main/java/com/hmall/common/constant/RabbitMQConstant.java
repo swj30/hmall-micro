@@ -27,4 +27,25 @@ public class RabbitMQConstant {
      */
     public static final String PAY_SUCCESS_ROUTING_KEY = "pay.success";
 
+    /**
+     * 清空购物车相关MQ常量
+     */
+
+    /**
+     * 交换机名称
+     */
+    public static final  String TRADE_EXCHANGE_NAME = "trade.topic";
+    /**
+     * 队列名称
+     */
+    public static final String TRADE_QUEUE_NAME = "cart.clear.queue";
+    /**
+     * 接收消息RoutingKey
+     */
+    public static final String TRADE_ROUTING_KEY = "order.#";
+    /**
+     * 发送消息RoutingKey
+     */
+    public static final String TRADE_SUCCESS_ROUTING_KEY = "order.create";
+
 }
