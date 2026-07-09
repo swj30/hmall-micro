@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.trade.TradeClient;
 import com.hmall.api.user.UserClient;
+import com.hmall.common.constant.RabbitMQConstant;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.UserContext;
@@ -16,6 +17,7 @@ import com.hmall.pay.mapper.PayOrderMapper;
 import com.hmall.pay.service.IPayOrderService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
     private final UserClient userClient;
     private final TradeClient tradeClient;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
@@ -46,7 +49,11 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         if (!success) {
             throw new BizIllegalException("交易已支付或关闭！");
         }
-        tradeClient.markOrderPaySuccess(po.getBizOrderNo());
+
+        // 同步调用改为异步调用
+        //tradeClient.markOrderPaySuccess(po.getBizOrderNo());
+        // 发送消息给RabbitMQ,传递订单id
+        rabbitTemplate.convertAndSend(RabbitMQConstant.PAY_EXCHANGE_NAME, RabbitMQConstant.PAY_SUCCESS_ROUTING_KEY, po.getBizOrderNo());
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
