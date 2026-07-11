@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    nacos:
+      server-addr: ${NACOS_ADDR:192.168.150.88:8848} # nacos地址
+      username: nacos # 用户名
+      password: nacos # 密码
+      discovery:  #注册中心
+        ip: 192.168.150.1 # 本服务所在机器的ip地址
+        namespace: ${NACOS_NAMESPACE:28dfebff-7ab9-4c2b-9b42-07731076135e}  #命名空间
+      config:   #配置中心
+        file-extension: yaml # 文件后缀名
+        namespace: ${NACOS_NAMESPACE:28dfebff-7ab9-4c2b-9b42-07731076135e}  #命名空间
+        group: ${GROUP_NAME:DEFAULT_GROUP}    # 配置分组
+        shared-configs:
+          - data-id: shared-jdbc.yaml
+          - data-id: shared-sentinel.yaml
+          - data-id: shared-log.yaml
+          - data-id: shared-seata.yaml
+          - data-id: shared-feign.yaml
+          - data-id: shared-swagger.yaml
+          - data-id: shared-rabbitmq.yaml
