@@ -6,10 +6,10 @@ spring:
       password: nacos # 密码
       discovery:  #注册中心
         ip: 192.168.150.1 # 本服务所在机器的ip地址
-        namespace: ${NACOS_NAMESPACE:28dfebff-7ab9-4c2b-9b42-07731076135e}  #命名空间
+        namespace: ${NACOS_NAMESPACE:6052a703-6607-4090-939e-e77327c82aac}  #命名空间
       config:   #配置中心
         file-extension: yaml # 文件后缀名
-        namespace: ${NACOS_NAMESPACE:28dfebff-7ab9-4c2b-9b42-07731076135e}  #命名空间
+        namespace: ${NACOS_NAMESPACE:6052a703-6607-4090-939e-e77327c82aac}  #命名空间
         group: ${GROUP_NAME:DEFAULT_GROUP}    # 配置分组
         shared-configs:
           - data-id: shared-jdbc.yaml
