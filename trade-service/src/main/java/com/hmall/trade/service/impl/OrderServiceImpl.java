@@ -6,6 +6,7 @@ import com.hmall.api.item.ItemClient;
 import com.hmall.api.item.dto.ItemDTO;
 import com.hmall.api.item.dto.OrderDetailDTO;
 import com.hmall.common.constant.RabbitMQConstant;
+import com.hmall.common.domain.dto.CartClearDTO;
 import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.utils.UserContext;
 import com.hmall.trade.domain.dto.OrderFormDTO;
@@ -63,7 +64,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 改为异步调用   ->  根据商品ids清空购物车内的商品
         // cartClient.deleteCartItemByIds(itemIds);
-        rabbitTemplate.convertAndSend(RabbitMQConstant.TRADE_EXCHANGE_NAME, RabbitMQConstant.TRADE_SUCCESS_ROUTING_KEY, itemIds);
+        rabbitTemplate.convertAndSend(RabbitMQConstant.TRADE_EXCHANGE_NAME, RabbitMQConstant.TRADE_SUCCESS_ROUTING_KEY,
+                new CartClearDTO(UserContext.getUser(), itemIds));
 
         // 发送消息给RabbitMQ, 商品ids
 
