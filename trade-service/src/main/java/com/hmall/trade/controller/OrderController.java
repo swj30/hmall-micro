@@ -1,8 +1,12 @@
 package com.hmall.trade.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hmall.common.domain.vo.OrderDetailVO;
+import com.hmall.common.domain.vo.OrderVO;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.trade.domain.dto.OrderFormDTO;
-import com.hmall.trade.domain.vo.OrderVO;
+import com.hmall.trade.domain.po.OrderDetail;
+import com.hmall.trade.service.IOrderDetailService;
 import com.hmall.trade.service.IOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -11,17 +15,28 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(tags = "订单管理接口")
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
     private final IOrderService orderService;
+    private final IOrderDetailService orderDetailService;
 
     @ApiOperation("根据id查询订单")
     @GetMapping("{id}")
     public OrderVO queryOrderById(@Param("订单id") @PathVariable("id") Long orderId) {
         return BeanUtils.copyBean(orderService.getById(orderId), OrderVO.class);
+    }
+
+
+    @GetMapping("/orderId")
+    public List<OrderDetailVO> queryOrderDetailByOrderId(@RequestParam("orderId") Long orderId) {
+        List<OrderDetail> orderDetails = orderDetailService.queryOrderDetailByOrderId(orderId);
+        List<OrderDetailVO> list = orderDetails.stream().map(orderDetail -> BeanUtils.copyBean(orderDetail, OrderDetailVO.class)).toList();
+        return list;
     }
 
     @ApiOperation("创建订单")
