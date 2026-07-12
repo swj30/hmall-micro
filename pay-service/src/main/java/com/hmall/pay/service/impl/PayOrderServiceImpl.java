@@ -65,7 +65,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         Long userId = UserContext.getUser();
         Map<String, Long> info = new HashMap<>();
         info.put("userId", userId);
-        info.put("orderId", payOrderFormDTO.getId());
+        info.put("orderId", po.getBizOrderNo());
         // 发送消息给RabbitMQ，传递订单id和用户id,用来加积分
         rabbitTemplate.convertAndSend(RabbitMQConstant.POINT_EXCHANGE_NAME, RabbitMQConstant.POINT_SUCCESS_ROUTING_KEY, info, message -> {
             // 添加延迟消息属性
