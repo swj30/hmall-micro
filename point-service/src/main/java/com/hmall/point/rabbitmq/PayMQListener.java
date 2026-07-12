@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * 消息监听
@@ -28,15 +29,17 @@ public class PayMQListener {
 
     /**
      * 监听支付消息，支付成功,积分+2
-     * @param orderId   订单id
+     * @param info   用户id + 订单id
      */
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = RabbitMQConstant.PAY_QUEUE_NAME),
-            exchange = @Exchange(name = RabbitMQConstant.PAY_EXCHANGE_NAME, type = ExchangeTypes.TOPIC),
-            key = RabbitMQConstant.PAY_ROUTING_KEY
+            value = @Queue(name = RabbitMQConstant.POINT_QUEUE_NAME),
+            exchange = @Exchange(name = RabbitMQConstant.POINT_EXCHANGE_NAME, delayed = "true", type = ExchangeTypes.TOPIC),
+            key = RabbitMQConstant.POINT_ROUTING_KEY
     ))
-    public void addPoints(Long orderId) {
-        log.info("监听到订单id: " + orderId);
-        pointsTransactionService.updatePointsTransaction(orderId);
+    public void addPoints(Map<String, Long> info) {
+        Long userId = info.get("userId");
+        Long orderId = info.get("orderId");
+        log.info("监听到用户信息:{}，订单信息:{}" + userId, orderId);
+        pointsTransactionService.updatePointsTransaction( userId, orderId);
     }
 }

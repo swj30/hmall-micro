@@ -1,5 +1,6 @@
 package com.hmall.pay.service.impl;
 
+import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,11 +18,17 @@ import com.hmall.pay.mapper.PayOrderMapper;
 import com.hmall.pay.service.IPayOrderService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +61,18 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         //tradeClient.markOrderPaySuccess(po.getBizOrderNo());
         // 发送消息给RabbitMQ,传递订单id
         rabbitTemplate.convertAndSend(RabbitMQConstant.PAY_EXCHANGE_NAME, RabbitMQConstant.PAY_SUCCESS_ROUTING_KEY, po.getBizOrderNo());
+
+        Long userId = UserContext.getUser();
+        Map<String, Long> info = new HashMap<>();
+        info.put("userId", userId);
+        info.put("orderId", payOrderFormDTO.getId());
+        // 发送消息给RabbitMQ，传递订单id和用户id,用来加积分
+        rabbitTemplate.convertAndSend(RabbitMQConstant.POINT_EXCHANGE_NAME, RabbitMQConstant.POINT_SUCCESS_ROUTING_KEY, info, message -> {
+            // 添加延迟消息属性
+            message.getMessageProperties().setDelay(10000);
+            return message;
+        });
+
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {

@@ -35,7 +35,9 @@ public class OrderController {
     @GetMapping("/orderId")
     public List<OrderDetailVO> queryOrderDetailByOrderId(@RequestParam("orderId") Long orderId) {
         List<OrderDetail> orderDetails = orderDetailService.queryOrderDetailByOrderId(orderId);
-        List<OrderDetailVO> list = orderDetails.stream().map(orderDetail -> BeanUtils.copyBean(orderDetail, OrderDetailVO.class)).toList();
+        List<OrderDetailVO> list = orderDetails.stream()
+                .map(orderDetail -> BeanUtils
+                        .copyBean(orderDetail, OrderDetailVO.class)).toList();
         return list;
     }
 

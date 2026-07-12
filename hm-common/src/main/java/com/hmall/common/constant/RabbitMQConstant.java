@@ -48,4 +48,25 @@ public class RabbitMQConstant {
      */
     public static final String TRADE_SUCCESS_ROUTING_KEY = "order.create";
 
+    /**
+     * 加积分相关MQ常量
+     */
+
+    /**
+     * 交换机名称
+     */
+    public static final  String POINT_EXCHANGE_NAME = "point.topic";
+    /**
+     * 队列名称
+     */
+    public static final String POINT_QUEUE_NAME = "point.add.queue";
+    /**
+     * 接收消息RoutingKey
+     */
+    public static final String POINT_ROUTING_KEY = "point.#";
+    /**
+     * 发送消息RoutingKey
+     */
+    public static final String POINT_SUCCESS_ROUTING_KEY = "point.add";
+
 }

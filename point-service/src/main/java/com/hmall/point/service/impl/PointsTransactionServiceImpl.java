@@ -79,9 +79,7 @@ public class PointsTransactionServiceImpl extends ServiceImpl<PointsTransactionM
     }
 
     @Override
-    public void updatePointsTransaction(Long orderId) {
-        // 获取用户Id
-        Long userId = UserContext.getUser();
+    public void updatePointsTransaction(Long userId, Long orderId) {
         // 根据订单Id查询订单表
         List<OrderDetailVO> orderDetailVOS = tradeClient.queryOrderDetailByOrderId(orderId);
 

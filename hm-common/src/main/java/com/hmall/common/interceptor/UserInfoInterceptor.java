@@ -1,5 +1,7 @@
 package com.hmall.common.interceptor;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.hmall.common.utils.UserContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -12,7 +14,7 @@ public class UserInfoInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String userInfo = request.getHeader("user-info");
         if (userInfo != null) {
-            UserContext.setUser(Long.valueOf(userInfo));
+            UserContext.setUser(Convert.toLong(userInfo));
         }
         return true;
     }
