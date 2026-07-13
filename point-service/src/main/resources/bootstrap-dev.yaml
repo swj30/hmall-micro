@@ -18,4 +18,4 @@ spring:
           - data-id: shared-seata.yaml
           - data-id: shared-feign.yaml
           - data-id: shared-swagger.yaml
-          - data-id: shared-rabbitmq.yaml
+          - data-id: shared-rabbitmq-consumer.yaml
