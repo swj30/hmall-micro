@@ -13,4 +13,10 @@ public interface IItemService extends IService<Item> {
     void deductStock(List<OrderDetailDTO> items);
 
     List<ItemDTO> queryItemByIds(Collection<Long> ids);
+
+    /**
+     * 订单超时未支付回退库存
+     * @param items
+     */
+    void addStock(List<OrderDetailDTO> items);
 }

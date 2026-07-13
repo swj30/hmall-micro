@@ -69,4 +69,25 @@ public class RabbitMQConstant {
      */
     public static final String POINT_SUCCESS_ROUTING_KEY = "point.add";
 
+    /**
+     * 订单支付超时回退商品库存相关MQ常量
+     */
+
+    /**
+     * 交换机名称
+     */
+    public static final String PAY_TIMEOUT_EXCHANGE_NAME = "pay.timeout";
+    /**
+     * 队列名称
+     */
+    public static final String PAY_TIMEOUT_QUEUE_NAME = "pay.timeout.queue";
+    /**
+     * 接收消息RoutingKey
+     */
+    public static final String PAY_TIMEOUT_ROUTING_KEY = "pay.#";
+    /**
+     * 发送消息RoutingKey
+     */
+    public static final String PAY_TIMEOUT_SUCCESS_ROUTING_KEY = "pay.timeout";
+
 }

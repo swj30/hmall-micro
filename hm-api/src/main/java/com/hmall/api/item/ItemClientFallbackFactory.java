@@ -33,6 +33,17 @@ public class ItemClientFallbackFactory implements FallbackFactory<ItemClient> {
                 log.error("调用商品服务扣减库存失败，参数items：{}", items, cause);
                 // 方法无返回值，仅打印日志记录异常
             }
+
+            /**
+             * 订单超时未支付回退库存
+             *
+             * @param items
+             */
+            @Override
+            public void addStock(List<OrderDetailDTO> items) {
+                // 记录无法退回库存的原因
+                log.error("退回库存失败", cause);
+            }
         };
     }
 }

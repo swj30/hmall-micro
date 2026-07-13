@@ -76,4 +76,13 @@ public class ItemController {
     public void deductStock(@RequestBody List<OrderDetailDTO> items){
         itemService.deductStock(items);
     }
+
+    /**
+     * 订单超时未支付回退库存
+     * @param items
+     */
+    @PostMapping("/reStock")
+    public void addStock(@RequestBody List<OrderDetailDTO> items){
+        itemService.addStock(items);
+    }
 }

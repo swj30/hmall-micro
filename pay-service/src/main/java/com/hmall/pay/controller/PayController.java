@@ -1,8 +1,10 @@
 package com.hmall.pay.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.pay.domain.dto.PayApplyDTO;
 import com.hmall.pay.domain.dto.PayOrderFormDTO;
+import com.hmall.pay.domain.po.PayOrder;
 import com.hmall.pay.enums.PayType;
 import com.hmall.pay.service.IPayOrderService;
 import io.swagger.annotations.Api;
@@ -34,5 +36,35 @@ public class PayController {
     public void tryPayOrderByBalance(@PathVariable("id") Long id, @RequestBody PayOrderFormDTO payOrderFormDTO) {
         payOrderFormDTO.setId(id);
         payOrderService.tryPayOrderByBalance(payOrderFormDTO);
+    }
+
+    /**
+     * 订单是否已经被支付
+     * @param orderId
+     * @return
+     */
+    @GetMapping("/{orderId}")
+    public Boolean isOrderPay(@PathVariable Long orderId) {
+        PayOrder payOrder = payOrderService.getOne(new LambdaQueryWrapper<PayOrder>()
+                .eq(PayOrder::getBizOrderNo, orderId)
+                .eq(PayOrder::getStatus, 1)
+        );
+        if (payOrder == null) {
+            // 支付了
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 修改pay_order表的status字段
+     * @param orderId
+     * @param status
+     */
+    @PutMapping("/updateStatus")
+    public void updatePayOrderStatus(@RequestParam("orderId") Long orderId,
+                                     @RequestParam("/status") Integer status) {
+        payOrderService.lambdaUpdate().eq(PayOrder::getBizOrderNo, orderId)
+                .set(PayOrder::getStatus, status).update();
     }
 }

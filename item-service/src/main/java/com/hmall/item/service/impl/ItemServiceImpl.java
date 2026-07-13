@@ -31,4 +31,23 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements II
     public List<ItemDTO> queryItemByIds(Collection<Long> ids) {
         return BeanUtils.copyList(listByIds(ids), ItemDTO.class);
     }
+
+    /**
+     * 订单超时未支付回退库存
+     *
+     * @param items
+     */
+    @Override
+    public void addStock(List<OrderDetailDTO> items) {
+        // 获取商品库存
+        items.forEach(item -> {
+            Long itemId = item.getItemId();
+            Integer num = item.getNum();
+            Integer stock = getById(itemId).getStock();
+            lambdaUpdate()
+                    .eq(Item::getId, itemId)
+                    .set(Item::getStock, stock + num)
+                    .update();
+        });
+    }
 }
