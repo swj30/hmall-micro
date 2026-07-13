@@ -83,31 +83,34 @@ public class PointsTransactionServiceImpl extends ServiceImpl<PointsTransactionM
         // 根据订单Id查询订单表
         List<OrderDetailVO> orderDetailVOS = tradeClient.queryOrderDetailByOrderId(orderId);
 
-        PointsTransaction pointsTransaction = new PointsTransaction();
-        PointsProductSnapshot pointsProductSnapshot = new PointsProductSnapshot();
         // 遍历商品详情列表，
         orderDetailVOS.forEach(orderDetail -> {
+            LocalDateTime now = LocalDateTime.now();
             // 补全积分流水表
-            pointsTransaction.setUserId(userId);
-            pointsTransaction.setOrderId(StrUtil.toString(orderId));
-            pointsTransaction.setProductId(orderDetail.getItemId());
-            pointsTransaction.setPointsChange(2);
-            pointsTransaction.setTransactionType(1);
-            pointsTransaction.setStatus(1);
-            pointsTransaction.setCreatedAt(LocalDateTime.now());
-            pointsTransaction.setUpdatedAt(LocalDateTime.now());
+            PointsTransaction pointsTransaction = PointsTransaction.builder()
+                    .userId(userId)
+                    .orderId(StrUtil.toString(orderId))
+                    .productId(orderDetail.getItemId())
+                    .pointsChange(2)
+                    .transactionType(1)
+                    .status(1)
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
             save(pointsTransaction);
 
             // 补全积分流水快照表
-            pointsProductSnapshot.setTransactionId(orderDetail.getId());
-            pointsProductSnapshot.setProductId(orderDetail.getItemId());
-            pointsProductSnapshot.setOrderId(StrUtil.toString(orderId));
-            pointsProductSnapshot.setProductName(orderDetail.getName());
-            pointsProductSnapshot.setProductImage(orderDetail.getImage());
-            pointsProductSnapshot.setSkuInfo(orderDetail.getSpec());
-            pointsProductSnapshot.setUnitPrice(BigDecimal.valueOf(orderDetail.getPrice()));
-            pointsProductSnapshot.setQuantity(orderDetail.getNum());
-            pointsProductSnapshot.setCreatedAt(LocalDateTime.now());
+            PointsProductSnapshot pointsProductSnapshot = PointsProductSnapshot.builder()
+                    .transactionId(pointsTransaction.getId())
+                    .productId(orderDetail.getItemId())
+                    .orderId(StrUtil.toString(orderId))
+                    .productName(orderDetail.getName())
+                    .productImage(orderDetail.getImage())
+                    .skuInfo(orderDetail.getSpec())
+                    .unitPrice(BigDecimal.valueOf(orderDetail.getPrice()))
+                    .quantity(orderDetail.getNum())
+                    .createdAt(now)
+                    .build();
 
             pointsProductSnapshotService.save(pointsProductSnapshot);
         });
