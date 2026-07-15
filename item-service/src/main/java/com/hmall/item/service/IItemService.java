@@ -14,6 +14,8 @@ public interface IItemService extends IService<Item> {
 
     List<ItemDTO> queryItemByIds(Collection<Long> ids);
 
+    ItemDTO queryItemById(Long id);
+
     /**
      * 订单超时未支付回退库存
      * @param items
