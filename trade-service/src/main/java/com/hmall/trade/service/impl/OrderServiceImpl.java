@@ -71,6 +71,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 new CartClearDTO(UserContext.getUser(), itemIds));
 
 
+        // TODO: 加错地方，加到pay-service微服务里
         // 延迟消息，用户下单后在规定的时间未支付，则商品数量退回库存
         // 需要传递用户id， 商品id,以及订单id
         // 传递的参数

@@ -1,6 +1,6 @@
 package com.hmall.pay.service.impl;
 
-import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,17 +18,14 @@ import com.hmall.pay.mapper.PayOrderMapper;
 import com.hmall.pay.service.IPayOrderService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +34,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     private final UserClient userClient;
     private final TradeClient tradeClient;
     private final RabbitTemplate rabbitTemplate;
+    private final RedissonClient redissonClient;
 
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
@@ -47,6 +45,31 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     @Override
     @GlobalTransactional
     public void tryPayOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
+        // 获取锁的名称
+        String lockName = Convert.toStr(payOrderFormDTO.getId());
+        // 获取锁
+        RLock lock = redissonClient.getFairLock(lockName);
+
+        try {
+            // 尝试获取锁,重试时间5s
+            boolean isLocked = lock.tryLock(5L, TimeUnit.SECONDS);
+            if (!isLocked) {
+                throw new RuntimeException("支付订单繁忙，请稍后重试");
+            }
+            // 调用支付逻辑
+            this.payOrderByBalance(payOrderFormDTO);
+        } catch (Exception e) {
+            throw new BizIllegalException("支付订单繁忙，请稍后重试");
+        } finally {
+            // 释放锁
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+
+    }
+
+    private void payOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
         var po = getById(payOrderFormDTO.getId());
         if (!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())) {
             throw new BizIllegalException("交易已支付或关闭！");
@@ -72,7 +95,6 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             message.getMessageProperties().setDelay(10000);
             return message;
         });
-
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
