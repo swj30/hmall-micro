@@ -41,15 +41,15 @@ public class OrderMQListener {
 
     /**
      * 订单超时未支付，自动退回库存
-     * @param cancelOrderDTO
+     * @param payOrderId 支付单id
      */
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = RabbitMQConstant.PAY_TIMEOUT_QUEUE_NAME),
             exchange = @Exchange(name = RabbitMQConstant.PAY_TIMEOUT_EXCHANGE_NAME, type = ExchangeTypes.TOPIC),
             key = RabbitMQConstant.PAY_TIMEOUT_ROUTING_KEY
     ))
-    public void payTimeOut(CancelOrderDTO cancelOrderDTO) {
-        log.info("监听到超时未支付订单信息:" +  cancelOrderDTO);
-        orderService.payTimeout(cancelOrderDTO);
+    public void payTimeOut(Long payOrderId) {
+        log.info("监听到超时未支付的支付单订单id:" +  payOrderId);
+        orderService.payTimeout(payOrderId);
     }
 }

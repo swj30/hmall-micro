@@ -40,13 +40,13 @@ public class PayController {
 
     /**
      * 订单是否已经被支付
-     * @param orderId
+     * @param payOrderId
      * @return
      */
-    @GetMapping("/{orderId}")
-    public Boolean isOrderPay(@PathVariable Long orderId) {
+    @GetMapping("/{payOrderId}")
+    public Boolean isOrderPay(@PathVariable Long payOrderId) {
         PayOrder payOrder = payOrderService.getOne(new LambdaQueryWrapper<PayOrder>()
-                .eq(PayOrder::getBizOrderNo, orderId)
+                .eq(PayOrder::getId, payOrderId)
                 .eq(PayOrder::getStatus, 1)
         );
         if (payOrder == null) {
@@ -58,13 +58,11 @@ public class PayController {
 
     /**
      * 修改pay_order表的status字段
-     * @param orderId
-     * @param status
+     * @param payOrderId 支付单id
      */
     @PutMapping("/updateStatus")
-    public void updatePayOrderStatus(@RequestParam("orderId") Long orderId,
-                                     @RequestParam("/status") Integer status) {
-        payOrderService.lambdaUpdate().eq(PayOrder::getBizOrderNo, orderId)
-                .set(PayOrder::getStatus, status).update();
+    public void updatePayOrderStatus(@RequestParam("orderId") Long payOrderId) {
+        payOrderService.lambdaUpdate().eq(PayOrder::getId, payOrderId)
+                .set(PayOrder::getStatus, 2).update();
     }
 }

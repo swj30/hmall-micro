@@ -11,18 +11,16 @@ public interface PayClient {
 
     /**
      * 订单是否已经被支付
-     * @param orderId
+     * @param payOrderId 支付单id
      * @return
      */
-    @GetMapping("/{orderId}")
-    public Boolean isOrderPay(@PathVariable Long orderId);
+    @GetMapping("/{payOrderId}")
+    public Boolean isOrderPay(@PathVariable Long payOrderId);
 
     /**
      * 修改pay_order表的status字段
-     * @param orderId
-     * @param status
+     * @param payOrderId 支付单id
      */
     @PutMapping("/updateStatus")
-    public void updatePayOrderStatus(@RequestParam("orderId") Long orderId,
-                                     @RequestParam("/status") Integer status);
+    public void updatePayOrderStatus(@RequestParam("orderId") Long payOrderId);
 }

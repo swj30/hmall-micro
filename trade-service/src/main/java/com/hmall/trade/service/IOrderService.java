@@ -13,7 +13,7 @@ public interface IOrderService extends IService<Order> {
 
     /**
      * 订单超时未支付处理逻辑
-     * @param cancelOrderDTO
+     * @param payOrderId 支付单id
      */
-    void payTimeout(CancelOrderDTO cancelOrderDTO);
+    void payTimeout(Long payOrderId);
 }

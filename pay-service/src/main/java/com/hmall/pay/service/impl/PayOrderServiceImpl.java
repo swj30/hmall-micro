@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.trade.TradeClient;
+import com.hmall.api.trade.dto.CancelOrderDTO;
 import com.hmall.api.user.UserClient;
 import com.hmall.common.constant.RabbitMQConstant;
 import com.hmall.common.exception.BizIllegalException;
@@ -18,6 +19,7 @@ import com.hmall.pay.mapper.PayOrderMapper;
 import com.hmall.pay.service.IPayOrderService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
@@ -39,6 +42,21 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
         var payOrder = checkIdempotent(applyDTO);
+
+
+        // 延迟消息，用户下单后在规定的时间未支付，把支付单的状态改为已超时
+        // 只需要传递支付单id就行
+        // 发送消息
+        rabbitTemplate.convertAndSend(RabbitMQConstant.PAY_TIMEOUT_EXCHANGE_NAME,
+                RabbitMQConstant.PAY_TIMEOUT_SUCCESS_ROUTING_KEY,
+                payOrder.getId(),
+                message -> {
+            // 添加延迟消息属性
+            message.getMessageProperties().setDelay(10000);
+            return message;
+        });
+        log.info("消息发送成功，支付单id: {}", payOrder.getId());
+
         return payOrder.getId().toString();
     }
 

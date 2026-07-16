@@ -71,22 +71,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 new CartClearDTO(UserContext.getUser(), itemIds));
 
 
-        // TODO: 加错地方，加到pay-service微服务里
-        // 延迟消息，用户下单后在规定的时间未支付，则商品数量退回库存
-        // 需要传递用户id， 商品id,以及订单id
-        // 传递的参数
-        CancelOrderDTO cancelOrderDTO = CancelOrderDTO.builder()
-                .userId(UserContext.getUser())
-                .orderId(order.getId())
-                .details(orderFormDTO.getDetails())
-                .build();
-        // 发送消息
-        rabbitTemplate.convertAndSend(RabbitMQConstant.PAY_TIMEOUT_EXCHANGE_NAME, RabbitMQConstant.PAY_TIMEOUT_SUCCESS_ROUTING_KEY, cancelOrderDTO, message -> {
-            // 添加延迟消息属性
-            message.getMessageProperties().setDelay(1800000);
-            return message;
-        });
-
         try {
             // 减库存
             itemClient.deductStock(detailDTOS);
@@ -114,38 +98,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     /**
      * 订单超时未支付处理逻辑
-     * @param cancelOrderDTO
+     * @param payOrderId 支付单信息
      */
     @Override
-    public void payTimeout(CancelOrderDTO cancelOrderDTO) {
-        Long orderId = cancelOrderDTO.getOrderId();
+    public void payTimeout(Long payOrderId) {
         // 先查询pay_order表，如果订单已支付，直接返回
-        Boolean isOrderPay = payClient.isOrderPay(orderId);
+        Boolean isOrderPay = payClient.isOrderPay(payOrderId);
         if (isOrderPay) {
             // 订单已经支付了，直接返回
             return;
         }
         // 订单未支付，退回库存
         // 先修改pay_order表的订单状态
-        payClient.updatePayOrderStatus(orderId, 2);
-
-        // 修改order表的状态为5订单关闭
-        lambdaUpdate()
-                .eq(Order::getId, orderId)
-                .set(Order::getStatus, 5)
-                .update();
-
-        // 回退库存
-        // 先拿到订单商品详情表
-        List<OrderDetailDTO> orderDetailList = cancelOrderDTO.getDetails();
-        List<OrderDetailDTO> detailDTOList = orderDetailList.stream()
-                .map(d -> OrderDetailDTO.builder()
-                        .itemId(d.getItemId())
-                        .num(d.getNum())
-                        .build()).toList();
-        // 调用item-service微服务的FeignClient方法去回退库存
-        itemClient.addStock(detailDTOList);
-
+        payClient.updatePayOrderStatus(payOrderId);
     }
 
     private List<OrderDetail> buildDetails(Long orderId, List<ItemDTO> items, Map<Long, Integer> numMap) {
